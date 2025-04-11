@@ -13,15 +13,15 @@ Pod::Spec.new do |s|
   s.authors      = package["author"]
 
   s.platforms    = { :ios => '14.0' }
-  s.source       = { :git => "https://github.com/mgcrea/react-native-local-storage.git", :tag => "#{s.version}" }
+  s.source       = { :git => "https://github.com/mgcrea/react-native-color-view.git", :tag => "#{s.version}" }
 
   s.pod_target_xcconfig = {
     "DEFINES_MODULE" => "YES",
     'SWIFT_COMPILATION_MODE' => 'wholemodule',
   }
 
-  s.source_files = "ios/**/*.{m,mm,cpp,swift}"
-  s.private_header_files = "ios/**/*.h"
+  s.source_files = "ios/**/*.{h,m,mm,cpp,swift}"
+  s.private_header_files = "ios/generated/**/*.h"
 
   install_modules_dependencies(s)
 end

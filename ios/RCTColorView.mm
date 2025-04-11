@@ -21,7 +21,8 @@ template <typename PropsT> NSDictionary *convertProps(const PropsT &props) {
 @end
 
 @implementation RCTColorView {
-  ColorView *_view;
+  ColorView *_containerView;
+  // ColorView *_view;
 }
 
 + (ComponentDescriptorProvider)componentDescriptorProvider {
@@ -35,13 +36,29 @@ template <typename PropsT> NSDictionary *convertProps(const PropsT &props) {
         std::make_shared<const NativeColorViewProps>();
     _props = defaultProps;
 
-    _view = [ColorView new];
+    // _containerView = [UIView new];
+    _containerView = [ColorView new];
 
-    self.contentView = _view;
+    // Add the native view as a subview.
+    // [_containerView addSubview:_view];
+
+    // Use containerView as the contentView so it can host children.
+    self.contentView = _containerView;
   }
 
   return self;
 }
+
+// These methods allow Fabric to pass along children.
+// - (void)insertReactSubview:(UIView *)subview atIndex:(NSInteger)atIndex {
+//   // Adjust index if necessary; here we assume children come after
+//   _colorView.
+//   [_containerView insertSubview:subview atIndex:atIndex + 1];
+// }
+
+// - (void)removeReactSubview:(UIView *)subview {
+//   [subview removeFromSuperview];
+// }
 
 - (void)updateProps:(Props::Shared const &)props
            oldProps:(Props::Shared const &)oldProps {
@@ -53,13 +70,14 @@ template <typename PropsT> NSDictionary *convertProps(const PropsT &props) {
   NSDictionary *oldViewPropsDict = convertProps(oldViewProps);
   NSDictionary *newViewPropsDict = convertProps(newViewProps);
 
-  [_view updatePropsWith:newViewPropsDict oldDictionary:oldViewPropsDict];
+  [_containerView updatePropsWith:newViewPropsDict
+                    oldDictionary:oldViewPropsDict];
 
   [super updateProps:props oldProps:oldProps];
 }
 
-Class<RCTComponentViewProtocol> FabricDeclarativeViewCls(void) {
-  return RCTColorView.class;
-}
+// Class<RCTComponentViewProtocol> FabricDeclarativeViewCls(void) {
+//   return RCTColorView.class;
+// }
 
 @end
