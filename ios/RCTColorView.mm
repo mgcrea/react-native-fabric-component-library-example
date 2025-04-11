@@ -5,29 +5,27 @@
 #import "generated/LibraryExampleSpec/Props.h"
 #import "generated/LibraryExampleSpec/RCTComponentViewHelpers.h"
 
-// #import "RCTFabricComponentsPlugins.h"
-// #import "FabricComponentExample-Swift.h"
 #import "NativeColorView-Swift.h"
 
 using namespace facebook::react;
+
+@interface RCTColorView () <RCTComponentViewProtocol, RCTNativeColorViewViewProtocol>
+@end
 
 template <typename PropsT> NSDictionary *convertProps(const PropsT &props) {
   // Adjust conversion per your prop structure.
   return @{@"color" : [NSString stringWithUTF8String:props.color.c_str()]};
 }
 
-@interface RCTColorView () <RCTComponentViewProtocol>
-
-@end
-
 @implementation RCTColorView {
+  boolean_t _isInWindow;
   ColorView *_containerView;
-  // ColorView *_view;
 }
 
-+ (ComponentDescriptorProvider)componentDescriptorProvider {
-  return concreteComponentDescriptorProvider<
-      NativeColorViewComponentDescriptor>();
+// Support RCT_DYNAMIC_FRAMEWORKS
+// (https://github.com/facebook/react-native/pull/37274)
++ (void)load {
+  [super load];
 }
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -36,11 +34,17 @@ template <typename PropsT> NSDictionary *convertProps(const PropsT &props) {
         std::make_shared<const NativeColorViewProps>();
     _props = defaultProps;
 
-    // _containerView = [UIView new];
     _containerView = [ColorView new];
 
-    // Add the native view as a subview.
-    // [_containerView addSubview:_view];
+    // Set up onChange callback
+    __weak RCTColorView *weakSelf = self;
+    _containerView.onTap = ^() {
+      NSLog(@"UIOnTap");
+      __strong RCTColorView *strongSelf = weakSelf;
+      if (strongSelf) {
+        [strongSelf emitEvent:@"onTap"];
+      }
+    };
 
     // Use containerView as the contentView so it can host children.
     self.contentView = _containerView;
@@ -49,16 +53,7 @@ template <typename PropsT> NSDictionary *convertProps(const PropsT &props) {
   return self;
 }
 
-// These methods allow Fabric to pass along children.
-// - (void)insertReactSubview:(UIView *)subview atIndex:(NSInteger)atIndex {
-//   // Adjust index if necessary; here we assume children come after
-//   _colorView.
-//   [_containerView insertSubview:subview atIndex:atIndex + 1];
-// }
-
-// - (void)removeReactSubview:(UIView *)subview {
-//   [subview removeFromSuperview];
-// }
+// MARK: - React Native Props Management
 
 - (void)updateProps:(Props::Shared const &)props
            oldProps:(Props::Shared const &)oldProps {
@@ -76,8 +71,48 @@ template <typename PropsT> NSDictionary *convertProps(const PropsT &props) {
   [super updateProps:props oldProps:oldProps];
 }
 
-// Class<RCTComponentViewProtocol> FabricDeclarativeViewCls(void) {
-//   return RCTColorView.class;
-// }
+// MARK: - RCTComponentViewProtocol
+
++ (ComponentDescriptorProvider)componentDescriptorProvider {
+  return concreteComponentDescriptorProvider<
+      NativeColorViewComponentDescriptor>();
+}
+
+// MARK: - UIView Lifecycle
+
+- (void)didMoveToWindow {
+  [super didMoveToWindow];
+  _isInWindow = (self.window != nil);
+}
+
+// MARK: - React Native Subview Management (optional)
+
+- (void)mountChildComponentView:
+            (UIView<RCTComponentViewProtocol> *)childComponentView
+                          index:(NSInteger)index {
+  [_containerView addSubview:childComponentView at:index];
+}
+
+- (void)unmountChildComponentView:
+            (UIView<RCTComponentViewProtocol> *)childComponentView
+                            index:(NSInteger)index {
+  [_containerView removeReactSubview:childComponentView];
+}
+
+// MARK: - Event Emitter (optional)
+
+- (void)emitEvent:(NSString *)name {
+  // Check if the view is in the window hierarchy
+  if (!_isInWindow) {
+    return;
+  }
+
+  NativeColorViewEventEmitter::OnTap event = {};
+  self.eventEmitter.onTap(event);
+}
+
+- (const NativeColorViewEventEmitter &)eventEmitter {
+  return static_cast<const NativeColorViewEventEmitter &>(*_eventEmitter);
+}
 
 @end

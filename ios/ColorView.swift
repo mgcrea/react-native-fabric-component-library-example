@@ -32,6 +32,7 @@ public class ColorView: UIView {
   private let contentView: UIView
   private var props: ColorViewProps
   private var cancellable: AnyCancellable?
+  @objc public var onTap: (() -> Void)?
 
   override init(frame: CGRect) {
     contentView = UIView()
@@ -75,9 +76,11 @@ public class ColorView: UIView {
   @objc
   public func handleTap() {
     print("ColorView tapped")
+    onTap?()
   }
 
-  // Methods to handle React Native children
+  // MARK: - React Native Subview Management
+
   @objc
   public func addSubview(_ subview: UIView, at index: NSInteger) {
     contentView.insertSubview(subview, at: index)
