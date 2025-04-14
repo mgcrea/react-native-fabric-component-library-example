@@ -40,8 +40,7 @@ public class ColorView: UIView {
     super.init(frame: frame)
     addSubview(contentView)
 
-    // This is the key part: make sure the contentView doesn't clip subviews
-    contentView.clipsToBounds = false
+    contentView.clipsToBounds = true
 
     // Subscribe to changes in props.color.
     cancellable = props.$color.sink { [weak self] newColor in
@@ -75,7 +74,6 @@ public class ColorView: UIView {
   // Handle the tap gesture directly in Swift.
   @objc
   public func handleTap() {
-    print("ColorView tapped")
     onTap?()
   }
 

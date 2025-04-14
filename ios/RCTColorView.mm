@@ -39,7 +39,6 @@ template <typename PropsT> NSDictionary *convertProps(const PropsT &props) {
     // Set up onChange callback
     __weak RCTColorView *weakSelf = self;
     _containerView.onTap = ^() {
-      NSLog(@"UIOnTap");
       __strong RCTColorView *strongSelf = weakSelf;
       if (strongSelf) {
         [strongSelf emitEvent:@"onTap"];

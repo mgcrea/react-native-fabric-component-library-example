@@ -17,8 +17,9 @@ function App(): React.JSX.Element {
         onTap={() => {
           console.log('Tapped from JS');
         }}>
-        <Text>ColorView2</Text>
-        <View style={styles.innerBox} />
+        <View style={styles.innerBox}>
+          <Text style={{color: 'white'}}>Hello</Text>
+        </View>
       </NativeColorView>
       <Button title="Change Color" onPress={onPress} />
     </View>
@@ -43,15 +44,14 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     // backgroundColor: 'red',
     borderColor: 'black',
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
   },
   innerBox: {
-    width: 120,
-    height: 120,
-    marginVertical: 1,
+    width: 50,
+    height: 50,
     backgroundColor: 'red',
     borderColor: 'black',
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
   },
   picker: {
     width: 300,
